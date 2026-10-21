@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pgsafe-mcp"
+version = "1.0.0"
+description = "Zero-Trust Database Inspection and Safe Query Guard MCP Server for AI Agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Johann Schiffer"}
+]
+keywords = ["mcp", "model-context-protocol", "postgres", "sqlite", "database", "claude", "cursor", "security", "ai-agent"]
+dependencies = []
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1.0"]
+
+[project.scripts]
+pgsafe-mcp = "pgsafe.server:main"
+pgsafe-cli = "pgsafe.cli:main"

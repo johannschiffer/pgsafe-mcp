@@ -1,0 +1,3 @@
+# Zero heavy dependencies for core SQLite support
+# For PostgreSQL support:
+# psycopg[binary]>=3.1.0
