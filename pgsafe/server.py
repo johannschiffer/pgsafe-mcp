@@ -233,7 +233,15 @@ class PgSafeMCPServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    server = PgSafeMCPServer()
+    import argparse
+    parser = argparse.ArgumentParser(
+        prog="pgsafe-mcp",
+        description="PgSafe MCP: Zero-Trust Database Inspection & Safe Query Guard for AI Agents"
+    )
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument("--db-url", type=str, default=None, help="Database connection URL (Postgres or SQLite). Defaults to DATABASE_URL or sqlite:///demo.db")
+    args, unknown = parser.parse_known_args()
+    server = PgSafeMCPServer(db_url=args.db_url)
     server.run_stdio()
 
 if __name__ == "__main__":
