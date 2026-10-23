@@ -1,5 +1,9 @@
 # PgSafe MCP (Lite Edition)
 
+> **Free:** [Genesis Starter Kit](https://johanld.gumroad.com/l/khffw) (25 `.cursorrules`/`CLAUDE.md` rulesets + MCP configs). Try the [live config builder](https://johannschiffer.github.io).
+> **Full stack:** all six servers in [Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz).
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)](https://python.org)
 [![MCP Compliant](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
@@ -7,6 +11,31 @@
 **PgSafe MCP** is a Zero-Trust Model Context Protocol server that enables AI agents in **Claude Desktop**, **Cursor**, **Windsurf**, and **Antigravity** to inspect schemas and run analytical SQL queries without risking accidental data loss, destructive mutations (`DROP`, `TRUNCATE`, `DELETE`), or runaway table scans.
 
 ---
+
+## Run without cloning
+
+```bash
+uvx --from git+https://github.com/johannschiffer/pgsafe-mcp pgsafe-mcp
+```
+
+Claude Desktop / Cursor config entry:
+
+```json
+{
+  "mcpServers": {
+    "pgsafe-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/johannschiffer/pgsafe-mcp",
+        "pgsafe-mcp"
+      ]
+    }
+  }
+}
+```
+
+[![CI](https://github.com/johannschiffer/pgsafe-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/johannschiffer/pgsafe-mcp/actions/workflows/ci.yml)
 
 ## 🛡️ Why PgSafe MCP?
 
@@ -98,7 +127,7 @@ For SQLite, simply point to your `.db` file:
 
 Running against live production workloads with sensitive customer data?
 
-| Feature | Lite (Open Source) | Pro ($14.99 USD) |
+| Feature | Lite (Open Source) | Enterprise Suite ($19) |
 |---|:---:|:---:|
 | **Read-Only SQL Validation** | ✅ | ✅ |
 | **Forced LIMIT Injection** | ✅ | ✅ |
@@ -110,10 +139,23 @@ Running against live production workloads with sensitive customer data?
 | **Production Docker & Compose** | ❌ | ✅ |
 | **Full Pytest Suite & Architecture Guide** | ❌ | ✅ |
 
-👉 **[Get PgSafe Pro on Gumroad ($14.99)](https://johanld.gumroad.com/l/pgsafe-mcp-pro)**
+👉 **[Get the Genesis Enterprise Suite ($19)](https://johanld.gumroad.com/l/tzuvz)**
 
 ---
 
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+## Genesis MCP Ecosystem
+
+| Module | What it does | Repo |
+|---|---|---|
+| **CrawlEngine MCP** | Anti-bot web scraping, clean Markdown, proxy rotation and TLS evasion | [GitHub](https://github.com/johannschiffer/crawlengine-mcp) |
+| **BrowserBridge MCP** | Deterministic headless browser automation with cryptographic action receipts | [GitHub](https://github.com/johannschiffer/browserbridge-mcp) |
+| **PgSafe MCP** (this repo) | Zero-trust PostgreSQL/SQLite guard, live PII masking, zero-downtime migration checks | [GitHub](https://github.com/johannschiffer/pgsafe-mcp) |
+| **OmniBridge MCP** | Multi-channel notification and webhook bus with a persistent SQLite WAL queue | [GitHub](https://github.com/johannschiffer/omnibridge-mcp) |
+| **SysFlow MCP** | Safe Linux administration plane: systemd, port audit, isolated execution | [GitHub](https://github.com/johannschiffer/sysflow-mcp) |
+| **FastMCP Forge** | Production MCP server scaffolder: stdio, SSE and auth middleware | [GitHub](https://github.com/johannschiffer/fastmcp-forge) |
+
+[Live config builder](https://johannschiffer.github.io) | [Starter Kit, free](https://johanld.gumroad.com/l/khffw) | [Enterprise Suite, $19](https://johanld.gumroad.com/l/tzuvz)

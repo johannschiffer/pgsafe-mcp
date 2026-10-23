@@ -58,5 +58,17 @@ def main():
     else:
         parser.print_help()
 
+
+
+_main_impl = main
+
+
+def main():
+    from ._genesis import print_upgrade_notice
+    try:
+        return _main_impl()
+    finally:
+        print_upgrade_notice()
+
 if __name__ == "__main__":
     main()
