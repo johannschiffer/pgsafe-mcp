@@ -6,6 +6,7 @@
 
 
 
+[![PyPI](https://img.shields.io/pypi/v/pgsafe-mcp.svg)](https://pypi.org/project/pgsafe-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)](https://python.org)
 [![MCP Compliant](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
@@ -36,8 +37,6 @@ Claude Desktop / Cursor config entry:
     "pgsafe-mcp": {
       "command": "uvx",
       "args": [
-        "--from",
-        "git+https://github.com/johannschiffer/pgsafe-mcp",
         "pgsafe-mcp"
       ]
     }
