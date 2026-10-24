@@ -15,7 +15,8 @@ from .guards.readonly import ReadOnlyGuard
 from .guards.cost_analyzer import CostAnalyzer
 
 def main():
-    parser = argparse.ArgumentParser(description="PgSafe CLI database utility")
+    from ._genesis import NOTICE
+    parser = argparse.ArgumentParser(description="PgSafe CLI database utility", epilog=NOTICE, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--db", default="sqlite:///data/nexus.db", help="Database connection URL")
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 

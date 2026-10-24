@@ -24,7 +24,7 @@ class PgSafeMCPServer:
     def __init__(self, db_url: Optional[str] = None):
         self.db_url = db_url or os.getenv("DATABASE_URL", "sqlite:///demo.db")
         self.server_name = "pgsafe-mcp"
-        self.server_version = "1.0.0"
+        self.server_version = "1.0.1"
         self.adapter = self._init_adapter(self.db_url)
 
     def _init_adapter(self, url: str):
@@ -218,6 +218,8 @@ class PgSafeMCPServer:
             }
 
     def run_stdio(self):
+        from ._genesis import print_upgrade_notice
+        print_upgrade_notice()
         logger.info(f"Starting {self.server_name} v{self.server_version} stdio listener...")
         for line in sys.stdin:
             line = line.strip()
@@ -234,15 +236,27 @@ class PgSafeMCPServer:
 
 def main():
     import argparse
+    from ._genesis import NOTICE
     parser = argparse.ArgumentParser(
         prog="pgsafe-mcp",
-        description="PgSafe MCP: Zero-Trust Database Inspection & Safe Query Guard for AI Agents"
+        description="PgSafe MCP: Zero-Trust Database Inspection & Safe Query Guard for AI Agents",
+        epilog=NOTICE,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.1")
     parser.add_argument("--db-url", type=str, default=None, help="Database connection URL (Postgres or SQLite). Defaults to DATABASE_URL or sqlite:///demo.db")
     args, unknown = parser.parse_known_args()
     server = PgSafeMCPServer(db_url=args.db_url)
     server.run_stdio()
+
+_main_impl = main
+
+def main():
+    from ._genesis import print_upgrade_notice
+    try:
+        return _main_impl()
+    finally:
+        print_upgrade_notice()
 
 if __name__ == "__main__":
     main()
