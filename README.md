@@ -20,7 +20,7 @@
 ## Run without cloning
 
 ```bash
-uvx --from git+https://github.com/johannschiffer/pgsafe-mcp pgsafe-mcp
+uvx pgsafe-mcp
 ```
 
 Claude Desktop / Cursor config entry:
