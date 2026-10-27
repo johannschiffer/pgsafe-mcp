@@ -1,10 +1,10 @@
 """
-Unit tests for PgSafe Pro MCP Server JSON-RPC protocol compliance.
+Unit tests for PgSafe MCP Server JSON-RPC protocol compliance.
 """
 import pytest
 import sqlite3
 import json
-from pgsafe.server import PgSafeProServer
+from pgsafe.server import PgSafeServer
 
 @pytest.fixture
 def test_db(tmp_path):
@@ -17,7 +17,7 @@ def test_db(tmp_path):
     return str(db_file)
 
 def test_mcp_initialize(test_db):
-    server = PgSafeProServer(db_url=f"sqlite:///{test_db}")
+    server = PgSafeServer(db_url=f"sqlite:///{test_db}")
     req = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -30,10 +30,10 @@ def test_mcp_initialize(test_db):
     }
     resp = server.handle_request(req)
     assert resp["id"] == 1
-    assert resp["result"]["serverInfo"]["name"] == "pgsafe-mcp-pro"
+    assert resp["result"]["serverInfo"]["name"] == "pgsafe-mcp"
 
 def test_mcp_list_and_safe_query(test_db):
-    server = PgSafeProServer(db_url=f"sqlite:///{test_db}")
+    server = PgSafeServer(db_url=f"sqlite:///{test_db}")
 
     # 1. list_tables
     req_list = {
@@ -77,7 +77,7 @@ def test_mcp_list_and_safe_query(test_db):
     assert b_content["blocked"] is True
 
 def test_mcp_security_status(test_db):
-    server = PgSafeProServer(db_url=f"sqlite:///{test_db}")
+    server = PgSafeServer(db_url=f"sqlite:///{test_db}")
     req = {
         "jsonrpc": "2.0",
         "id": 5,
@@ -86,6 +86,5 @@ def test_mcp_security_status(test_db):
     }
     resp = server.handle_request(req)
     content = json.loads(resp["result"]["content"][0]["text"])
-    assert content["edition"] == "Enterprise Pro"
     assert content["guards"]["readonly_guard"] == "ACTIVE"
     assert content["guards"]["pii_masking_engine"] == "ACTIVE"

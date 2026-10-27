@@ -1,5 +1,5 @@
 """
-Dry-Run Mutation Simulation Harness (PgSafe Pro Feature).
+Dry-Run Mutation Simulation Harness (PgSafe Feature).
 Allows AI agents to test INSERT/UPDATE/DELETE statements in an isolated transaction
 with guaranteed auto-ROLLBACK, returning simulated rows affected without modifying state.
 """

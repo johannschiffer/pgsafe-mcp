@@ -1,5 +1,5 @@
 """
-Real-Time PII (Personally Identifiable Information) Redaction Engine (Pro Feature).
+Real-Time PII (Personally Identifiable Information) Redaction Engine.
 Prevents customer emails, credit cards, password hashes, and tokens from leaking into LLM context windows.
 """
 import re

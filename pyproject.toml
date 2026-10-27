@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pgsafe-mcp"
-version = "2.0.0"
+version = "1.0.0"
 description = "Zero-trust database inspection, safe query guard, and mutation simulation MCP server for AI agents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,8 +27,8 @@ pgsafe-cli = "pgsafe.cli:main"
 include = ["pgsafe*"]
 
 [project.urls]
-Homepage = "https://johannschiffer.github.io"
-Documentation = "https://johannschiffer.github.io"
+Homepage = "https://github.com/johannschiffer/pgsafe-mcp"
+Documentation = "https://github.com/johannschiffer/pgsafe-mcp#readme"
 Repository = "https://github.com/johannschiffer/pgsafe-mcp"
 Issues = "https://github.com/johannschiffer/pgsafe-mcp/issues"
 Funding = "https://ko-fi.com/johannschiffer"

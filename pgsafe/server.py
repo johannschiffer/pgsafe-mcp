@@ -1,5 +1,5 @@
 """
-PgSafe MCP: Model Context Protocol Server (Enterprise Pro Edition)
+PgSafe MCP: Model Context Protocol Server
 Includes Zero-Trust Read-Only Guard, Real-Time PII Masking,
 Dry-Run Mutation Simulation Harness, and Index Recommendation Advisor.
 """
@@ -19,15 +19,15 @@ from .core.index_advisor import IndexAdvisor
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [PgSafe-Pro] %(message)s",
+    format="%(asctime)s [%(levelname)s] [PgSafe] %(message)s",
     stream=sys.stderr
 )
-logger = logging.getLogger("PgSafeProServer")
+logger = logging.getLogger("PgSafeServer")
 
-class PgSafeProServer:
+class PgSafeServer:
     def __init__(self, db_url: Optional[str] = None):
         self.db_url = db_url or os.getenv("DATABASE_URL", "sqlite:///data/nexus.db")
-        self.server_name = "pgsafe-mcp-pro"
+        self.server_name = "pgsafe-mcp"
         self.server_version = "1.0.0"
         self.adapter = self._init_adapter(self.db_url)
 
@@ -186,7 +186,7 @@ class PgSafeProServer:
 
         elif name == "get_security_status":
             return {
-                "edition": "Enterprise Pro",
+                
                 "database_url": self.db_url,
                 "guards": {
                     "readonly_guard": "ACTIVE",
@@ -282,7 +282,7 @@ class PgSafeProServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    server = PgSafeProServer()
+    server = PgSafeServer()
     server.run_stdio()
 
 if __name__ == "__main__":

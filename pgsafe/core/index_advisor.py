@@ -1,5 +1,5 @@
 """
-Index & Query Optimization Advisor (PgSafe Pro Feature).
+Index & Query Optimization Advisor (PgSafe Feature).
 Analyzes WHERE filters, ORDER BY clauses, and JOIN keys to recommend optimal database indexes.
 """
 import re
