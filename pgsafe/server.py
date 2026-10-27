@@ -1,4 +1,3 @@
-from ._genesis import NOTICE, print_upgrade_notice
 """
 PgSafe MCP: Model Context Protocol Server (Enterprise Pro Edition)
 Includes Zero-Trust Read-Only Guard, Real-Time PII Masking,
@@ -283,7 +282,6 @@ class PgSafeProServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    print_upgrade_notice()
     server = PgSafeProServer()
     server.run_stdio()
 

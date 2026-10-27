@@ -62,12 +62,15 @@ Giving an AI assistant raw access to your database is terrifying:
 
 ## ⚡ Features (Open Source v2.0)
 
-- 🔒 **Enforced Read-Only Guard**: Automatically detects and blocks all destructive statements (`DROP`, `TRUNCATE`, `ALTER`, `UPDATE`, `INSERT`, `DELETE`).
+- 🛡️ **Read-Only SQL Validation**: Zero-trust AST query validation blocking destructive statements (`DROP`, `TRUNCATE`, `DELETE`, `ALTER`).
 - 🛑 **Anti-Chaining Protection**: Disallows multi-statement execution via semicolons.
-- ⏱️ **Automatic LIMIT Injection**: Ensures every `SELECT` query has a capped `LIMIT` clause (default: 100 rows, max: 1,000) to protect database memory.
-- 📊 **Zero-Cost Schema Reflection**: Tools to explore public tables and columns without executing custom introspection queries.
-- 🪶 **Zero Dependency Core**: Native support for SQLite out of the box; optional PostgreSQL adapter.
-
+- 🔍 **Safe Schema Inspector**: Read-only table schema and column definition discovery.
+- ⏱️ **Auto-LIMIT Injection**: Enforces max row caps to prevent memory exhaustion and table locks.
+- 🌐 **Multi-Database Support**: PostgreSQL, SQLite, MySQL, MariaDB, and ClickHouse.
+- 🎭 **Automatic PII Redaction & Masking**: Masks emails, credit cards, and sensitive identifiers on the fly.
+- 🧪 **Dry-Run Mutation Simulation**: Auto-rollback transaction harness for testing migrations safely.
+- 💡 **Index Recommendation Advisor**: Analyzes query execution plans and suggests missing indexes.
+- 🐳 **Production Docker & Compose**: Sandboxed container environment.
 ---
 
 ## 🚀 Quick Setup in 2 Minutes
@@ -135,24 +138,6 @@ For SQLite, simply point to your `.db` file:
 
 ---
 
-## 💎 Need Enterprise Data Protection? Upgrade to PgSafe Pro
-
-Running against live production workloads with sensitive customer data?
-
-| Feature | v1.0 (Legacy) | v2.0 (Open Source) |
-|---|:---:|:---:|
-| **Read-Only SQL Validation** | ✅ | ✅ |
-| **Forced LIMIT Injection** | ✅ | ✅ |
-| **PostgreSQL & SQLite** | ✅ | ✅ |
-| **MySQL, MariaDB & ClickHouse** | ❌ | ✅ |
-| **Automatic PII Redaction & Masking** *(Emails, Cards, Hashes)* | ❌ | ✅ |
-| **Dry-Run Mutation Simulation** *(Auto-Rollback Test Harness)* | ❌ | ✅ |
-| **Index Recommendation Advisor** | ❌ | ✅ |
-| **Production Docker & Compose** | ❌ | ✅ |
-| **Full Pytest Suite & Architecture Guide** | ❌ | ✅ |
-
----
-
 ## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
@@ -177,3 +162,11 @@ MIT License. See [LICENSE](LICENSE) for details.
   - **High-Performance VPS & Nodes**: [Hetzner Cloud](https://www.hetzner.com/cloud) & [DigitalOcean](https://m.do.co/c/johannschiffer)
   - **Reliable Proxy Pool & IP Rotation**: [Webshare](https://www.webshare.io/) & [Bright Data](https://brightdata.com/)
   - **Documentation & Setup Guides**: [johannschiffer.github.io](https://johannschiffer.github.io/)
+
+---
+
+## Support
+
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/johannschiffer)
+
+If you find this tool helpful, you can support its maintenance via Ko-fi.
