@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pgsafe-mcp": {
+      "command": "uvx",
+      "args": ["pgsafe-mcp"]
+    }
+  }
+}

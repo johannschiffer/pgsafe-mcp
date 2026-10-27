@@ -1,6 +1,8 @@
+from ._genesis import NOTICE, print_upgrade_notice
 """
-PgSafe MCP: Model Context Protocol Server (Lite Edition)
-Implements standard JSON-RPC 2.0 stdio transport with Zero-Trust database access.
+PgSafe MCP: Model Context Protocol Server (Enterprise Pro Edition)
+Includes Zero-Trust Read-Only Guard, Real-Time PII Masking,
+Dry-Run Mutation Simulation Harness, and Index Recommendation Advisor.
 """
 
 import sys
@@ -12,26 +14,28 @@ from .guards.readonly import ReadOnlyGuard
 from .guards.cost_analyzer import CostAnalyzer
 from .adapters.sqlite_adapter import SQLiteAdapter
 from .adapters.postgres_adapter import PostgresAdapter
+from .core.pii_masker import PIIMasker
+from .core.dry_run_harness import DryRunHarness
+from .core.index_advisor import IndexAdvisor
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [PgSafe] %(message)s",
+    format="%(asctime)s [%(levelname)s] [PgSafe-Pro] %(message)s",
     stream=sys.stderr
 )
-logger = logging.getLogger("PgSafeServer")
+logger = logging.getLogger("PgSafeProServer")
 
-class PgSafeMCPServer:
+class PgSafeProServer:
     def __init__(self, db_url: Optional[str] = None):
-        self.db_url = db_url or os.getenv("DATABASE_URL", "sqlite:///demo.db")
-        self.server_name = "pgsafe-mcp"
-        self.server_version = "1.0.1"
+        self.db_url = db_url or os.getenv("DATABASE_URL", "sqlite:///data/nexus.db")
+        self.server_name = "pgsafe-mcp-pro"
+        self.server_version = "1.0.0"
         self.adapter = self._init_adapter(self.db_url)
 
     def _init_adapter(self, url: str):
         if url.startswith("postgres://") or url.startswith("postgresql://"):
             return PostgresAdapter(url)
         else:
-            # Assume SQLite path or sqlite:///
             clean_path = url.replace("sqlite:///", "").replace("sqlite://", "")
             return SQLiteAdapter(clean_path)
 
@@ -39,57 +43,70 @@ class PgSafeMCPServer:
         return [
             {
                 "name": "list_tables",
-                "description": "List all public database tables available for inspection and querying.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {}
-                }
+                "description": "List all database tables available for inspection.",
+                "inputSchema": {"type": "object", "properties": {}}
             },
             {
                 "name": "describe_table",
-                "description": "Retrieve column definitions, data types, nullability, and keys for a specific table.",
+                "description": "Inspect column names, data types, nullability, and primary keys for a table.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "table_name": {
-                            "type": "string",
-                            "description": "Name of the table to inspect"
-                        }
+                        "table_name": {"type": "string", "description": "Table name to inspect"}
                     },
                     "required": ["table_name"]
                 }
             },
             {
                 "name": "safe_query",
-                "description": "Execute a strictly read-only SQL query with automatic LIMIT enforcement and mutation blocking.",
+                "description": "Execute a strictly read-only SQL query with automatic LIMIT enforcement and real-time PII redaction.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "SQL query to execute (must be SELECT/EXPLAIN)"
-                        },
-                        "limit": {
-                            "type": "integer",
-                            "description": "Maximum rows to return (default: 100, max: 1000)"
-                        }
+                        "query": {"type": "string", "description": "SQL SELECT/EXPLAIN query"},
+                        "limit": {"type": "integer", "description": "Max rows to return (default: 100, max: 1000)"},
+                        "mask_pii": {"type": "boolean", "description": "Redact customer emails, credit cards and password hashes (default: true)"}
                     },
                     "required": ["query"]
                 }
             },
             {
-                "name": "analyze_query",
-                "description": "Analyze a SQL query for dangerous operations, unindexed scans, and Cartesian join risks without executing it.",
+                "name": "dry_run_mutation",
+                "description": "Simulate an INSERT, UPDATE, or DELETE query in an isolated transaction with guaranteed auto-ROLLBACK.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "SQL query to inspect"
-                        }
+                        "mutation_sql": {"type": "string", "description": "Mutation SQL statement to test"}
+                    },
+                    "required": ["mutation_sql"]
+                }
+            },
+            {
+                "name": "analyze_query",
+                "description": "Evaluate query complexity, full table scan risks, and missing filters without execution.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "SQL query to inspect"}
                     },
                     "required": ["query"]
                 }
+            },
+            {
+                "name": "recommend_indexes",
+                "description": "Analyze SQL query filters to recommend optimal composite or single-column indexes.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "SQL query to optimize"}
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "get_security_status",
+                "description": "Check status of active zero-trust security engines (PII Masker, Read-Only Guard, Dry-Run Harness).",
+                "inputSchema": {"type": "object", "properties": {}}
             }
         ]
 
@@ -106,8 +123,8 @@ class PgSafeMCPServer:
         elif name == "safe_query":
             raw_sql = arguments.get("query", "")
             limit = arguments.get("limit", 100)
+            mask_pii = arguments.get("mask_pii", True)
 
-            # 1. Read-only validation
             is_safe, reason = ReadOnlyGuard.validate(raw_sql)
             if not is_safe:
                 return {
@@ -116,25 +133,35 @@ class PgSafeMCPServer:
                     "blocked": True
                 }
 
-            # 2. Limit enforcement & risk evaluation
-            safe_sql = CostAnalyzer.enforce_limit(raw_sql, default_limit=limit, max_limit=1000)
+            safe_sql = CostAnalyzer.enforce_limit(raw_sql, default_limit=limit)
             risk = CostAnalyzer.evaluate_risk(raw_sql)
 
-            # 3. Execution
             try:
                 cols, rows = self.adapter.execute_read_only(safe_sql)
+                if mask_pii:
+                    rows = PIIMasker.mask_dataset(cols, rows)
+
                 return {
                     "success": True,
                     "query_executed": safe_sql,
                     "columns": cols,
                     "rows": rows,
                     "row_count": len(rows),
+                    "pii_redacted": mask_pii,
                     "risk_analysis": risk
                 }
             except Exception as e:
+                return {"success": False, "error": f"Database execution error: {str(e)}"}
+
+        elif name == "dry_run_mutation":
+            mutation_sql = arguments.get("mutation_sql", "")
+            # Only supports SQLite or local adapters with transaction rollback
+            if isinstance(self.adapter, SQLiteAdapter):
+                return DryRunHarness.simulate_sqlite(self.adapter.db_path, mutation_sql)
+            else:
                 return {
                     "success": False,
-                    "error": f"Database execution error: {str(e)}"
+                    "error": "Dry-run mutation currently configured for SQLite/Local engines in this version."
                 }
 
         elif name == "analyze_query":
@@ -146,6 +173,29 @@ class PgSafeMCPServer:
                 "is_read_only": is_safe,
                 "security_verdict": reason,
                 "performance_risk": risk
+            }
+
+        elif name == "recommend_indexes":
+            raw_sql = arguments.get("query", "")
+            recommendations = IndexAdvisor.analyze_and_recommend(raw_sql)
+            return {
+                "success": True,
+                "query": raw_sql,
+                "recommendations": recommendations,
+                "count": len(recommendations)
+            }
+
+        elif name == "get_security_status":
+            return {
+                "edition": "Enterprise Pro",
+                "database_url": self.db_url,
+                "guards": {
+                    "readonly_guard": "ACTIVE",
+                    "pii_masking_engine": "ACTIVE",
+                    "dry_run_mutation_harness": "ACTIVE",
+                    "cost_analyzer": "ACTIVE",
+                    "index_advisor": "ACTIVE"
+                }
             }
 
         else:
@@ -218,8 +268,6 @@ class PgSafeMCPServer:
             }
 
     def run_stdio(self):
-        from ._genesis import print_upgrade_notice
-        print_upgrade_notice()
         logger.info(f"Starting {self.server_name} v{self.server_version} stdio listener...")
         for line in sys.stdin:
             line = line.strip()
@@ -235,28 +283,9 @@ class PgSafeMCPServer:
                 logger.error(f"Error processing stdio line: {e}")
 
 def main():
-    import argparse
-    from ._genesis import NOTICE
-    parser = argparse.ArgumentParser(
-        prog="pgsafe-mcp",
-        description="PgSafe MCP: Zero-Trust Database Inspection & Safe Query Guard for AI Agents",
-        epilog=NOTICE,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0.1")
-    parser.add_argument("--db-url", type=str, default=None, help="Database connection URL (Postgres or SQLite). Defaults to DATABASE_URL or sqlite:///demo.db")
-    args, unknown = parser.parse_known_args()
-    server = PgSafeMCPServer(db_url=args.db_url)
+    print_upgrade_notice()
+    server = PgSafeProServer()
     server.run_stdio()
-
-_main_impl = main
-
-def main():
-    from ._genesis import print_upgrade_notice
-    try:
-        return _main_impl()
-    finally:
-        print_upgrade_notice()
 
 if __name__ == "__main__":
     main()

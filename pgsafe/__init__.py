@@ -1,8 +1,9 @@
 """
-PgSafe MCP (Lite Edition)
-Zero-Trust Database Inspection and Safe Query Guard MCP Server for AI Agents.
+pgsafe-mcp (v2.0.0)
+Zero-trust database inspection, safe query guard, and mutation simulation MCP server for AI agents
+100% Free & Open Source under the MIT License.
 """
 
-__version__ = "1.0.4"
-__author__ = "Johann Schiffer / NEXUS"
+__version__ = "2.0.0"
+__author__ = "Johann Schiffer"
 __license__ = "MIT"
