@@ -6,35 +6,21 @@
 
 > **100% Free & Open Source (MIT)**: All features, proxy rotation, migration simulation, Docker stacks, and recipes are completely unlocked. Support open development on [Ko-fi](https://ko-fi.com/johannschiffer).
 
-
-> 
-
-> ### ⚡ Enterprise Infrastructure & Tooling
-> | Component | Pricing | Delivery / Direct Access |
+> ### ⚡ Open Source Ecosystem & Community Tools
+> | Resource | Access | Description |
 > |---|---|---|
-> | **Starter Kit** | **Free ($0+)** | 25+ `.cursorrules`, `CLAUDE.md` stack rules & MCP config templates. [Download Free](https://github.com/johannschiffer) |
-> | **Enterprise Suite Pro** | **$9 Early Access** ~~$19~~ | 6 Pro MCP Servers, Zero-Downtime DB migrations, Residential Proxies, Docker Compose Stack & Commercial License. [Get Early Access ($9)](https://github.com/johannschiffer) |
-> | **Config Generator** | **Free Web Tool** | Interactive visual config generator for Claude Desktop & Cursor. [Open Generator](https://johannschiffer.github.io/) |
-
+> | **Ruleset Bundle** | **100% Free** | 55+ production rulesets & MCP config templates. [Download Free](https://johannschiffer.github.io/) |
+> | **Support & Donate** | **Ko-fi** | Support open-source maintenance. [Support on Ko-fi](https://ko-fi.com/johannschiffer) |
 
 <a href="https://glama.ai/mcp/servers/@johannschiffer/pgsafe-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@johannschiffer/pgsafe-mcp/badge" alt="pgsafe-mcp MCP server" />
 </a>
-
-
 
 [![PyPI](https://img.shields.io/pypi/v/pgsafe-mcp.svg)](https://pypi.org/project/pgsafe-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-brightgreen.svg)](https://python.org)
 [![MCP Compliant](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
 
-
-> ### ⚡ Enterprise Infrastructure & Tooling
-> | Package | Access | Features |
-> |---|---|---|
-> | **Starter Kit** | **Free ($0+)** | 25+ `.cursorrules`, `CLAUDE.md` stack rules & MCP config templates. [Download Free](https://github.com/johannschiffer) |
-> | **Enterprise Suite Pro** | **Free MIT** | 6 Pro MCP Servers, Zero-Downtime DB migrations, Residential Proxies, Docker Compose Stack & Commercial License. [Get Pro License](https://github.com/johannschiffer) |
-> | **Config Generator** | **Free Web Tool** | Interactive visual config generator for Claude Desktop & Cursor. [Open Generator](https://johannschiffer.github.io/) |
 
 **PgSafe MCP** is a Zero-Trust Model Context Protocol server that enables AI agents in **Claude Desktop**, **Cursor**, **Windsurf**, and **Antigravity** to inspect schemas and run analytical SQL queries without risking accidental data loss, destructive mutations (`DROP`, `TRUNCATE`, `DELETE`), or runaway table scans.
 
@@ -165,22 +151,7 @@ Running against live production workloads with sensitive customer data?
 | **Production Docker & Compose** | ❌ | ✅ |
 | **Full Pytest Suite & Architecture Guide** | ❌ | ✅ |
 
-
-
 ---
-
-
-## Solución Enterprise (Genesis Suite)
-
-Para despliegues en producción y cargas intensivas con bypass de rate limits, soporte multi-tenant y configuraciones Docker precompiladas:
-
-- **Bypass de Rate Limits & IP Rotation:** Protección de bases de datos multi-tenant, enmascaramiento PII en vivo y verificaciones de migración sin caída.
-- **Soporte Multi-Tenant & RBAC:** Control de accesos granular, gestión de secretos y auditoría criptográfica.
-- **Docker Compose Stacks:** Contenedores precompilados y configuraciones listas para producción con orquestación autónoma.
-
-  
-
-
 
 ## 📄 License
 
