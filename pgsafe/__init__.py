@@ -1,9 +1,8 @@
 """
-pgsafe-mcp (v1.0.0)
-Zero-trust database inspection, safe query guard, and mutation simulation MCP server for AI agents
-
+pgsafe-mcp
+Read-only PostgreSQL and SQLite query guard, PII masking, and dry-run mutation MCP server.
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.1"
 __author__ = "Johann Schiffer"
 __license__ = "MIT"

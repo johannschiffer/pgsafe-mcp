@@ -1,22 +1,28 @@
 """
 PgSafe CLI inspection tool.
 Usage:
-  python -m pgsafe.cli tables --db sqlite:///demo.db
-  python -m pgsafe.cli describe users --db sqlite:///demo.db
-  python -m pgsafe.cli query "SELECT * FROM users" --db sqlite:///demo.db
+  pgsafe-cli tables --db sqlite:///demo.db
+  pgsafe-cli describe users --db sqlite:///demo.db
+  pgsafe-cli query "SELECT * FROM users" --db sqlite:///demo.db
 """
 
 import argparse
 import json
 import sys
-from .adapters.sqlite_adapter import SQLiteAdapter
-from .adapters.postgres_adapter import PostgresAdapter
+from . import __version__
+from .server import PgSafeServer
 from .guards.readonly import ReadOnlyGuard
 from .guards.cost_analyzer import CostAnalyzer
 
+
 def main():
-    parser = argparse.ArgumentParser(description="PgSafe CLI database utility", formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--db", default="sqlite:///data/nexus.db", help="Database connection URL")
+    parser = argparse.ArgumentParser(
+        prog="pgsafe-cli",
+        description="PgSafe CLI database utility",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("-v", "--version", action="version", version=f"pgsafe-mcp {__version__}")
+    parser.add_argument("--db", default=None, help="Database connection URL")
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 
     subparsers.add_parser("tables", help="List database tables")
@@ -29,13 +35,12 @@ def main():
     query_parser.add_argument("--limit", type=int, default=100, help="Row limit")
 
     args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        return
 
-    url = args.db
-    if url.startswith("postgres://") or url.startswith("postgresql://"):
-        adapter = PostgresAdapter(url)
-    else:
-        clean_path = url.replace("sqlite:///", "").replace("sqlite://", "")
-        adapter = SQLiteAdapter(clean_path)
+    server = PgSafeServer(db_url=args.db)
+    adapter = server.adapter
 
     if args.command == "tables":
         tables = adapter.list_tables()
@@ -54,10 +59,6 @@ def main():
         safe_sql = CostAnalyzer.enforce_limit(args.sql, default_limit=args.limit)
         cols, rows = adapter.execute_read_only(safe_sql)
         print(json.dumps({"columns": cols, "rows": rows, "count": len(rows)}, indent=2))
-
-    else:
-        parser.print_help()
-
 
 
 if __name__ == "__main__":

@@ -6,5 +6,5 @@ startCommand:
   commandFunction: |-
     (config) => ({
       command: 'uvx',
-      args: ['--from', 'git+https://github.com/johannschiffer/pgsafe-mcp', 'pgsafe-mcp']
+      args: ['pgsafe-mcp']
     })
