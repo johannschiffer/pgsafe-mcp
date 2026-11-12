@@ -67,3 +67,25 @@ def test_security_status_redacts_password():
     srv = PgSafeServer(db_url="sqlite:///:memory:")
     status = srv.handle_tool_call("get_security_status", {})
     assert status["guards"]["readonly_guard"] == "ACTIVE"
+
+
+
+def test_guard_blocks_side_effect_selects_and_allows_benign_functions():
+    from pgsafe.guards.readonly import ReadOnlyGuard
+
+    for sql in (
+        "SELECT * INTO newt FROM users",
+        "SELECT set_config('default_transaction_read_only','off',false)",
+        "SELECT nextval('s')",
+        "SELECT pg_sleep(100)",
+        "SELECT lo_unlink(1)",
+        "SELECT pg_advisory_lock(1)",
+    ):
+        assert ReadOnlyGuard.validate(sql)[0] is False, sql
+
+    for sql in (
+        "SELECT replace(name, 'a', 'b') FROM users",
+        'SELECT "set" FROM t',
+        "SELECT * FROM t WHERE do = 1",
+    ):
+        assert ReadOnlyGuard.validate(sql)[0] is True, sql

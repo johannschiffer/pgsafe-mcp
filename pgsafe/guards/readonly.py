@@ -20,19 +20,13 @@ BLOCKED_KEYWORDS = [
     "EXECUTE",
     "CALL",
     "RENAME",
-    "REPLACE",
     "MERGE",
     "VACUUM",
     "ATTACH",
     "DETACH",
-    "COPY",
-    "DO",
-    "SET",
-    "RESET",
     "LOAD_EXTENSION",
     "REINDEX",
     "CLUSTER",
-    "LOCK",
     "PG_READ_FILE",
     "PG_READ_BINARY_FILE",
     "PG_LS_DIR",
@@ -41,6 +35,21 @@ BLOCKED_KEYWORDS = [
     "PG_TERMINATE_BACKEND",
     "PG_CANCEL_BACKEND",
     "DBLINK",
+    "INTO",
+    "SET_CONFIG",
+    "NEXTVAL",
+    "SETVAL",
+    "PG_SLEEP",
+    "PG_SLEEP_FOR",
+    "PG_SLEEP_UNTIL",
+    "PG_RELOAD_CONF",
+    "PG_ROTATE_LOGFILE",
+    "PG_CREATE_RESTORE_POINT",
+]
+
+_BLOCKED_PATTERNS = [
+    ("LO_*", re.compile(r"\bLO_[A-Z_]+\b", re.IGNORECASE)),
+    ("PG_ADVISORY_*", re.compile(r"\bPG_(?:TRY_)?ADVISORY_[A-Z_]+\b", re.IGNORECASE)),
 ]
 
 COMPILED_BLOCKED = [(kw, re.compile(rf"\b{kw}\b", re.IGNORECASE)) for kw in BLOCKED_KEYWORDS]
@@ -186,7 +195,7 @@ class ReadOnlyGuard:
         if first_word == "PRAGMA" and "=" in stmt:
             return False, "Blocked keyword detected in query: 'PRAGMA assignment'"
 
-        for kw, pattern in COMPILED_BLOCKED:
+        for kw, pattern in COMPILED_BLOCKED + _BLOCKED_PATTERNS:
             if pattern.search(stmt):
                 return False, f"Blocked keyword detected in query: '{kw}'"
 
