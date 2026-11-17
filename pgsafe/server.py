@@ -7,11 +7,13 @@ and index recommendation tools over stdio.
 import sys
 import os
 import json
+import time
 import logging
 import argparse
 from urllib.parse import urlsplit, urlunsplit
 from typing import Dict, Any, List, Optional
 from . import __version__
+from ._genesis import is_blackbox_enabled, record_blackbox_event
 from .guards.readonly import ReadOnlyGuard
 from .guards.cost_analyzer import CostAnalyzer
 from .adapters.sqlite_adapter import SQLiteAdapter
@@ -150,6 +152,35 @@ class PgSafeServer:
         ]
 
     def handle_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        start_t = time.perf_counter()
+        result = self._execute_tool_call(name, arguments)
+        duration_ms = round((time.perf_counter() - start_t) * 1000.0, 3)
+        status = "ok" if result.get("success", True) else "error"
+        if name in ("safe_query", "dry_run_mutation", "analyze_query", "recommend_indexes"):
+            record_blackbox_event(
+                "SQL_QUERY",
+                {
+                    "tool": name,
+                    "query": arguments.get("query") or arguments.get("mutation_sql", ""),
+                    "blocked": bool(result.get("blocked", False)),
+                    "row_count": result.get("row_count"),
+                    "error": result.get("error"),
+                },
+                source=self.server_name,
+                duration_ms=duration_ms,
+                status=status,
+            )
+        else:
+            record_blackbox_event(
+                "MCP_TOOL",
+                {"tool": name},
+                source=self.server_name,
+                duration_ms=duration_ms,
+                status=status,
+            )
+        return result
+
+    def _execute_tool_call(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         if name == "list_tables":
             tables = self.adapter.list_tables()
             return {"success": True, "tables": tables, "count": len(tables)}
@@ -231,6 +262,7 @@ class PgSafeServer:
                     "dry_run_mutation_harness": "ACTIVE",
                     "cost_analyzer": "ACTIVE",
                     "index_advisor": "ACTIVE",
+                    "blackbox_bridge": "ACTIVE" if is_blackbox_enabled() else "STANDBY",
                 },
             }
 
